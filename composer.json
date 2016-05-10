@@ -1,0 +1,17 @@
+{
+    "name": "adampolak1/event-sourcing",
+    "require-dev": {
+        "phpspec/phpspec": "~2.5"
+    },
+    "authors": [
+        {
+            "name": "Adam Polak",
+            "email": "adam.polak@silence.pl"
+        }
+    ],
+    "require": {},
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {"psr-0":{"":"src"}}
+}
