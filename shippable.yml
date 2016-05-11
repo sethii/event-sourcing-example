@@ -1,0 +1,11 @@
+language: php
+
+php:
+    - 5.6
+
+before_script:
+    - composer self-update -n
+    - composer install --prefer-dist -n
+
+script:
+    - ./bin/phpspec run -fpretty --verbose -n
