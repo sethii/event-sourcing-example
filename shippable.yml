@@ -8,4 +8,4 @@ before_script:
     - composer install --prefer-dist -n
 
 script:
-    - ./bin/phpspec run -fpretty --verbose -n
+    - ./bin/phpspec run --format=junit --verbose -n
