@@ -13,4 +13,4 @@ before_script:
 
 script:
     - ./bin/phpspec run --format=junit --verbose -n > shippable/testresults/specs.xml
-    - ./bin/behat --format junit --out shippable/testresults/behats.xml
+    - ./bin/behat --format junit --out shippable/testresults
