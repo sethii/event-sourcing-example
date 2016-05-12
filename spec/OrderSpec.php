@@ -69,4 +69,15 @@ class OrderSpec extends ObjectBehavior
             ]
         ]);
     }
+
+    function it_should_fail()
+    {
+        $this->beConstructedThrough('reconstituteFrom',[
+            [
+                new \OrderOpenedEvent('some_id', 'some_supplier_id')
+            ]
+        ]);
+
+        $this->getStatus()->shouldReturn("FAIL");
+    }
 }
