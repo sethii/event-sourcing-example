@@ -1,13 +1,20 @@
 <?php
 
-class OrderClosedEvent implements Event
+namespace Domain\Order\Event;
+
+use Domain\Event;
+
+class OrderOpenedEvent implements Event
 {
     private $orderId;
+    private $supplierId;
 
     public function __construct(
-        $orderId
+        $orderId,
+        $supplierId
     ) {
         $this->orderId = $orderId;
+        $this->supplierId = $supplierId;
     }
 
     /**
@@ -17,6 +24,7 @@ class OrderClosedEvent implements Event
     {
         return [
             'id' => $this->orderId,
+            'supplierId' => $this->supplierId
         ];
     }
 
@@ -25,6 +33,6 @@ class OrderClosedEvent implements Event
      */
     public function getType()
     {
-        return 'OrderClosedEvent';
+        return 'OrderOpenedEvent';
     }
 }

@@ -1,17 +1,19 @@
 <?php
+namespace Domain;
 
-class Order
+use Domain\Order\Event\OrderOpenedEvent;
+use Domain\Order\Event\OrderClosedEvent;
+use Domain\Order\Event\PositionAddedToOrderEvent;
+
+class Order extends AggregateRoot
 {
-    private $recentEvents;
-
     private $status;
-    private $id;
     private $positions = [];
     private $supplierId;
 
-    public function getId()
+    public function __construct($orderId)
     {
-        return $this->id;
+        $this->aggregateId = $orderId;
     }
 
     public function getSupplierId()
@@ -29,78 +31,66 @@ class Order
         return $this->positions;
     }
 
-    public function getRecentEvents()
-    {
-        $eventsCopy = $this->recentEvents;
-
-        $this->recentEvents = [];
-
-        return $eventsCopy;
-    }
-
     public function open($supplierId)
     {
-        $id = 'some_random_id_here';
-        $openOrderEvent =  new OrderOpenedEvent($id, $supplierId);
+        $openOrderEvent =  new OrderOpenedEvent($this->aggregateId, $supplierId);
 
         $this->recentEvents[] = $openOrderEvent;
-        $this->apply($openOrderEvent);
+        $this->applyEvent($openOrderEvent);
     }
 
     public function close()
     {
-        $closeOrderEvent = new OrderClosedEvent($this->id);
+        $closeOrderEvent = new OrderClosedEvent($this->aggregateId);
 
         $this->recentEvents[] = $closeOrderEvent;
-        $this->apply($closeOrderEvent);
+        $this->applyEvent($closeOrderEvent);
     }
 
-    public function addPosition($owner, $id, $name, $price)
+    public function addPosition($owner, $name, $price)
     {
         $positionAddedToOrderEvent = new PositionAddedToOrderEvent(
-            $this->id,
+            $this->aggregateId,
             $owner,
-            $id,
+            uniqid(),
             $name,
             $price
         );
 
         $this->recentEvents[] = $positionAddedToOrderEvent;
-        $this->apply($positionAddedToOrderEvent);
+        $this->applyEvent($positionAddedToOrderEvent);
     }
 
     /**
+     * @param string $orderId
      * @param Event[] $events
      * @return Order
      */
-    public static function reconstituteFrom(array $events)
+    public static function reconstituteFrom($orderId, array $events)
     {
-        $order = new Order();
+        $order = new Order($orderId);
 
         foreach ($events as $event) {
-            $order->apply($event);
+            $order->applyEvent($event);
         }
 
         return $order;
     }
 
-    private function applyOrderClosedEvent(Event $orderClosedEvent)
+    protected function applyOrderClosedEvent(Event $orderClosedEvent)
     {
-        $orderParameters = $orderClosedEvent->getParameters();
-
         $this->status = 'Closed';
     }
 
-    private function applyOrderOpenedEvent(Event $orderOpenedEvent)
+    protected function applyOrderOpenedEvent(Event $orderOpenedEvent)
     {
         $orderParameters = $orderOpenedEvent->getParameters();
 
         $this->status = 'Opened';
-        $this->id = $orderParameters['id'];
         $this->supplierId = $orderParameters['supplierId'];
     }
 
-    private function applyPositionAddedToOrderEvent(Event $positionAddedToOrderEvent)
+    protected function applyPositionAddedToOrderEvent(Event $positionAddedToOrderEvent)
     {
         $orderParameters = $positionAddedToOrderEvent->getParameters();
 
@@ -110,15 +100,5 @@ class Order
             'name' => $orderParameters['positionName'],
             'price' => $orderParameters['positionPrice'],
         ];
-    }
-
-    /**
-     * @param Event $event
-     */
-    private function apply(Event $event)
-    {
-        $method = 'apply' . $event->getType();
-
-        $this->$method($event);
     }
 }

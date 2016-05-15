@@ -10,7 +10,9 @@
             "email": "adam.polak@silence.pl"
         }
     ],
-    "require": {},
+    "require": {
+        "league/tactician": "dev-master"
+    },
     "config": {
         "bin-dir": "bin"
     },

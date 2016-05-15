@@ -1,5 +1,9 @@
 <?php
 
+namespace Domain\Order\Event;
+
+use Domain\Event;
+
 class PositionAddedToOrderEvent implements Event
 {
     private $orderId;
